@@ -1,96 +1,79 @@
 var gulp = require('gulp');
-var less = require('gulp-less');
-var browserSync = require('browser-sync').create();
-var header = require('gulp-header');
-var cleanCSS = require('gulp-clean-css');
-var rename = require("gulp-rename");
+var csso = require('gulp-csso');
 var uglify = require('gulp-uglify');
-var pkg = require('./package.json');
+var concat = require('gulp-concat');
+var sass = require('gulp-sass');
+var plumber = require('gulp-plumber');
+var cp = require('child_process');
+var imagemin = require('gulp-imagemin');
+var browserSync = require('browser-sync');
 
-// Set the banner content
-var banner = ['/*!\n',
-    ' * Start Bootstrap - <%= pkg.title %> v<%= pkg.version %> (<%= pkg.homepage %>)\n',
-    ' * Copyright 2013-' + (new Date()).getFullYear(), ' <%= pkg.author %>\n',
-    ' * Licensed under <%= pkg.license.type %> (<%= pkg.license.url %>)\n',
-    ' */\n',
-    ''
-].join('');
+var jekyllCommand = (/^win/.test(process.platform)) ? 'jekyll.bat' : 'jekyll';
 
-// Compile LESS files from /less into /css
-gulp.task('less', function() {
-    return gulp.src('less/new-age.less')
-        .pipe(less())
-        .pipe(header(banner, { pkg: pkg }))
-        .pipe(gulp.dest('css'))
-        .pipe(browserSync.reload({
-            stream: true
-        }))
+/*
+ * Build the Jekyll Site
+ * runs a child process in node that runs the jekyll commands
+ */
+gulp.task('jekyll-build', function (done) {
+	return cp.spawn(jekyllCommand, ['build'], {stdio: 'inherit'})
+		.on('close', done);
 });
 
-// Minify compiled CSS
-gulp.task('minify-css', ['less'], function() {
-    return gulp.src('css/new-age.css')
-        .pipe(cleanCSS({ compatibility: 'ie8' }))
-        .pipe(rename({ suffix: '.min' }))
-        .pipe(gulp.dest('css'))
-        .pipe(browserSync.reload({
-            stream: true
-        }))
+/*
+ * Rebuild Jekyll & reload browserSync
+ */
+gulp.task('jekyll-rebuild', ['jekyll-build'], function () {
+	browserSync.reload();
 });
 
-// Minify JS
-gulp.task('minify-js', function() {
-    return gulp.src('js/new-age.js')
-        .pipe(uglify())
-        .pipe(header(banner, { pkg: pkg }))
-        .pipe(rename({ suffix: '.min' }))
-        .pipe(gulp.dest('js'))
-        .pipe(browserSync.reload({
-            stream: true
-        }))
+/*
+ * Build the jekyll site and launch browser-sync
+ */
+gulp.task('browser-sync', ['jekyll-build'], function() {
+	browserSync({
+		server: {
+			baseDir: '_site'
+		}
+	});
 });
 
-// Copy vendor libraries from /node_modules into /vendor
-gulp.task('copy', function() {
-    gulp.src(['node_modules/bootstrap/dist/**/*', '!**/npm.js', '!**/bootstrap-theme.*', '!**/*.map'])
-        .pipe(gulp.dest('vendor/bootstrap'))
-
-    gulp.src(['node_modules/jquery/dist/jquery.js', 'node_modules/jquery/dist/jquery.min.js'])
-        .pipe(gulp.dest('vendor/jquery'))
-
-    gulp.src(['node_modules/simple-line-icons/*/*'])
-        .pipe(gulp.dest('vendor/simple-line-icons'))
-
-
-    gulp.src([
-            'node_modules/font-awesome/**',
-            '!node_modules/font-awesome/**/*.map',
-            '!node_modules/font-awesome/.npmignore',
-            '!node_modules/font-awesome/*.txt',
-            '!node_modules/font-awesome/*.md',
-            '!node_modules/font-awesome/*.json'
-        ])
-        .pipe(gulp.dest('vendor/font-awesome'))
-})
-
-// Run everything
-gulp.task('default', ['less', 'minify-css', 'minify-js', 'copy']);
-
-// Configure the browserSync task
-gulp.task('browserSync', function() {
-    browserSync.init({
-        server: {
-            baseDir: ''
-        },
-    })
-})
-
-// Dev task with browserSync
-gulp.task('dev', ['browserSync', 'less', 'minify-css', 'minify-js'], function() {
-    gulp.watch('less/*.less', ['less']);
-    gulp.watch('css/*.css', ['minify-css']);
-    gulp.watch('js/*.js', ['minify-js']);
-    // Reloads the browser whenever HTML or JS files change
-    gulp.watch('*.html', browserSync.reload);
-    gulp.watch('js/**/*.js', browserSync.reload);
+/*
+* Compile and minify sass
+*/
+gulp.task('sass', function() {
+  gulp.src('src/styles/**/*.scss')
+    .pipe(plumber())
+    .pipe(sass())
+    .pipe(csso())
+    .pipe(gulp.dest('assets/css'));
 });
+
+/*
+ * Minify images
+ */
+gulp.task('imagemin', function() {
+	return gulp.src('src/img/**/*.{jpg,png,gif}')
+		.pipe(plumber())
+		.pipe(imagemin({ optimizationLevel: 3, progressive: true, interlaced: true }))
+		.pipe(gulp.dest('assets/img/'));
+});
+
+/**
+ * Compile and minify js
+ */
+gulp.task('js', function(){
+	return gulp.src('src/js/**/*.js')
+		.pipe(plumber())
+		.pipe(concat('main.js'))
+		.pipe(uglify())
+		.pipe(gulp.dest('assets/js/'))
+});
+
+gulp.task('watch', function() {
+  gulp.watch('src/styles/**/*.scss', ['sass']);
+  gulp.watch('src/js/**/*.js', ['js']);
+	gulp.watch('src/img/**/*.{jpg,png,gif}', ['imagemin']);
+  gulp.watch(['*html', '_includes/*html', '_layouts/*.html'], ['jekyll-rebuild']);
+});
+
+gulp.task('default', ['js', 'sass', 'browser-sync', 'watch']);
