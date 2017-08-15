@@ -1,46 +1,34 @@
-#New Age Jekyll theme
-=========================
+# Bef is a responsive jekyll theme
 
-## If you are a company and you're going to use the blog: 
-1. contact bootstrap start up and ask.
-2. contact me because there is to remove some useless part.
+Bef - Blog Enjoy Freedom is a responsive jekyll theme which created to be simple and freedom.
 
-Jekyll theme based on [New Age bootstrap theme ](https://startbootstrap.com/template-overviews/new-age/)
+## Demo
 
-# Demo
-View this jekyll theme in action [here](https://jekynewage.github.io/)
+Check the theme in action [Demo](https://artemsheludko.github.io/bef/)
 
-## Built by
-[Antonio Trento](https://it.linkedin.com/in/antoniotrento)
+The main page would look like this:
 
-This Jekyll template was created to develop, landing pages, squeeze pages, portfolio and blog or all the above.
+![Main page preview](https://github.com/artemsheludko/bef/blob/master/assets/img/bef_main_page.jpg?raw=true)
 
-###I integrated analytical tools and marketing such as:
-- Google Ad Words
-- Google analytics
-- Disqus comment system
-- Add This social sharing
+The post page would look like this:
 
->>External stylesheets and libraries included are Google Fonts, Font Awesome, Normalize.CSS, and WOW.js
+![Post page preview](https://github.com/artemsheludko/bef/blob/master/assets/img/bef_post.jpg?raw=true)
 
-In order to set your log data to applications _config.yml just open the file and find the associated items.
+## Features
 
-I also built a system to add their own names on the same company files
+- [Google Fonts](https://fonts.google.com/)
+- [Font Awesome](http://fontawesome.io/)
+- [Vide](http://vodkabears.github.io/vide/)
+- [Disqus](https://disqus.com/)
+- [MailChimp](https://mailchimp.com/)
+- [Formspree!](https://formspree.io/)
+- [Analytics](https://analytics.google.com/analytics/web/)
+- Share Buttons, Recent Post, Section Author, Contact and more...
 
-**To change the base colors yellow go in css folder there main.css where you can set the primary color and the secondary color, remember that the theme is gradient in the background areas**
+## Installation:
 
+Fork the ``master`` branch and delete ``gh-pages`` branch in it. This is important because ``gh-pages`` branch is used here only to host the blog. You should be using the master branch as the source and create a fresh ``gh-pages`` branch.
 
-If you are interested in implementing this theme please contact me without any problems I will do what is in my power to help you!
+### License
 
-If you have noticed anything unusual or errors in my development I ask you kindly let me know or send a pull request!
-
-Any opinion and critical comment is welcome! So give us inside!
-
-We can get in touch by:
-
-1. By <a href="https://twitter.com/lantoniotrento">twitter</a>
-2. mail <a href="mailto:lantoniotrento@gmail.com">lantoniotrento[at]gmail.com</a>
-3. Via <a href="https://it.linkedin.com/in/antoniotrento">LinkedIn</a>
-
-=========
-For more details, read the [documentation](http://jekyllrb.com/)
+GNU General Public License v3.0
